@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Remontex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0f1117;
+      --surface:#181c27;
+      --surface2:#1e2233;
+      --surface3:#252a3d;
+      --border:#2d334d;
+      --border2:#3a4160;
+      --accent:#3b82f6;
+      --accent2:#60a5fa;
+      --accent-glow:rgba(59,130,246,.15);
+      --text:#e8eaf0;
+      --muted:#7c8aaa;
+      --dim:#4a5270;
+      --success:#10b981;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --r:10px;
+      --r2:6px;
+    }
+    html,body{height:100%;width:100%;overflow:hidden;font-family:'Inter',sans-serif;font-size:clamp(11px,1.2vw,14px);background:var(--bg);color:var(--text)}
+
+    /* ── LAYOUT ─────────────────────────── */
+    .shell{display:flex;flex-direction:column;height:100vh;width:100vw;overflow:hidden}
+
+    /* ── SIDEBAR ────────────────────────── */
+    .sidebar{
+      position:fixed;top:0;left:0;bottom:0;
+      width:clamp(52px,5vw,68px);
+      background:var(--surface);
+      border-right:1px solid var(--border);
+      display:flex;flex-direction:column;align-items:center;
+      padding:1rem 0;gap:.75rem;z-index:10;
+    }
+    .sidebar .logo{
+      width:36px;height:36px;border-radius:10px;
+      background:var(--accent);display:flex;align-items:center;justify-content:center;
+      font-size:16px;font-weight:600;color:#fff;margin-bottom:.5rem;flex-shrink:0;
+    }
+    .sidebar .nav-btn{
+      width:38px;height:38px;border-radius:var(--r2);
+      background:none;border:none;color:var(--muted);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      font-size:18px;transition:background .15s,color .15s;position:relative;
+    }
+    .sidebar .nav-btn:hover,.sidebar .nav-btn.active{background:var(--accent-glow);color:var(--accent2)}
+    .sidebar .nav-btn.active::before{
+      content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);
+      width:3px;height:22px;background:var(--accent);border-radius:0 3px 3px 0;
+    }
+    .sidebar .sep{width:28px;height:1px;background:var(--border);margin:.25rem 0}
+
+    /* ── MAIN ───────────────────────────── */
+    .main{margin-left:clamp(52px,5vw,68px);flex:1;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+    /* ── TOPBAR ─────────────────────────── */
+    .topbar{
+      height:clamp(44px,5vh,56px);
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;padding:0 clamp(12px,2vw,24px);
+      gap:12px;flex-shrink:0;background:var(--surface);
+    }
+    .topbar h1{font-size:clamp(12px,1.3vw,15px);font-weight:500;color:var(--text);flex:1}
+    .topbar .chip{
+      font-size:clamp(10px,1vw,12px);padding:3px 10px;border-radius:20px;
+      background:var(--accent-glow);color:var(--accent2);border:1px solid var(--accent);
+      display:flex;align-items:center;gap:5px;
+    }
+    .topbar .chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);display:block}
+
+    /* ── PAGE CONTAINER ─────────────────── */
+    .pages{flex:1;overflow:hidden}
+    .page{display:none;height:100%;overflow:auto}
+    .page.active{display:block}
+
+    /* ── HOME GRID ──────────────────────── */
+    .home-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      grid-template-rows:auto auto 1fr;
+      gap:clamp(8px,1.2vw,16px);
+      padding:clamp(10px,1.5vw,20px);
+      height:100%;
+      min-height:0;
+    }
+
+    /* ── CARD ───────────────────────────── */
+    .card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--r);padding:clamp(10px,1.5vw,18px);
+      display:flex;flex-direction:column;gap:clamp(6px,1vw,12px);min-height:0;overflow:hidden;
+    }
+    .card-title{font-size:clamp(9px,.9vw,11px);font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+
+    /* ── DATE CARD ──────────────────────── */
+    .date-card{grid-column:1;background:linear-gradient(135deg,#1a2240,#0f1524);border-color:#2a3458;justify-content:flex-end;padding:clamp(12px,1.8vw,22px)}
+    .date-card .day{font-size:clamp(48px,8vw,110px);font-weight:200;color:var(--text);line-height:.9;letter-spacing:-3px}
+    .date-card .month{font-size:clamp(14px,2vw,26px);color:var(--accent2);font-weight:400;margin-top:6px;letter-spacing:.02em}
+    .date-card .weekday{font-size:clamp(10px,1.1vw,14px);color:var(--dim);margin-top:4px;letter-spacing:.06em;text-transform:uppercase}
+
+    /* ── STATS CARD ─────────────────────── */
+    .stats-card{grid-column:2}
+    .stats-row{display:flex;align-items:center;gap:10px;padding:clamp(4px,.6vw,8px) 0;border-bottom:1px solid var(--border)}
+    .stats-row:last-child{border:none;padding-bottom:0}
+    .stats-row .ico{width:clamp(24px,2.5vw,30px);height:clamp(24px,2.5vw,30px);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:clamp(11px,1.1vw,14px);flex-shrink:0}
+    .stats-row .lbl{flex:1;font-size:clamp(10px,1vw,13px);color:var(--muted)}
+    .stats-row .val{font-size:clamp(13px,1.5vw,18px);font-weight:600}
+    .ico-blue{background:rgba(59,130,246,.15)}
+    .ico-amber{background:rgba(245,158,11,.15)}
+    .ico-red{background:rgba(239,68,68,.15)}
+    .ico-green{background:rgba(16,185,129,.15)}
+
+    /* ── BIG NUMS ────────────────────────── */
+    .bignums-card{grid-column:3;display:grid;grid-template-columns:1fr 1fr;gap:clamp(6px,1vw,12px)}
+    .bignum{background:var(--surface2);border-radius:var(--r2);padding:clamp(8px,1vw,14px);text-align:center}
+    .bignum .n{font-size:clamp(20px,3vw,38px);font-weight:600;line-height:1}
+    .bignum .l{font-size:clamp(9px,.9vw,11px);color:var(--muted);margin-top:3px}
+    .n-blue{color:var(--accent2)}
+    .n-green{color:var(--success)}
+
+    /* ── FORM CARD ──────────────────────── */
+    .form-card{grid-column:1/4}
+    .form-header{display:flex;align-items:center;justify-content:space-between}
+    .form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,1vw,10px)}
+    .form-grid input,.form-grid select{
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:var(--r2);color:var(--text);
+      padding:clamp(6px,.8vw,10px) clamp(8px,1vw,12px);
+      font-size:clamp(10px,1vw,13px);outline:none;width:100%;
+      font-family:inherit;transition:border-color .15s,background .15s;
+    }
+    .form-grid input::placeholder,.form-grid select::placeholder{color:var(--dim)}
+    .form-grid input:focus,.form-grid select:focus{border-color:var(--accent);background:var(--surface3)}
+    .form-grid select option{background:var(--surface2)}
+    .btn-primary{
+      background:var(--accent);color:#fff;border:none;
+      border-radius:var(--r2);padding:clamp(6px,.8vw,10px);
+      font-size:clamp(10px,1vw,13px);font-weight:500;cursor:pointer;
+      width:100%;transition:background .15s,transform .1s;font-family:inherit;
+    }
+    .btn-primary:hover{background:#2563eb}
+    .btn-primary:active{transform:scale(.98)}
+
+    /* ── NOTES CARD ─────────────────────── */
+    .notes-card{grid-column:1/3;grid-row:3}
+    .notes-card textarea{
+      flex:1;background:var(--surface2);border:1px solid var(--border);
+      border-radius:var(--r2);color:var(--text);
+      padding:clamp(8px,1vw,12px);font-size:clamp(10px,1vw,13px);
+      resize:none;outline:none;width:100%;font-family:inherit;line-height:1.6;min-height:0;
+    }
+    .notes-card textarea:focus{border-color:var(--accent)}
+    .btn-sm{
+      background:var(--surface3);color:var(--muted);border:1px solid var(--border);
+      border-radius:var(--r2);padding:4px 12px;font-size:clamp(9px,.9vw,11px);
+      cursor:pointer;transition:background .15s,color .15s;font-family:inherit;white-space:nowrap;
+    }
+    .btn-sm:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+    /* ── SEARCH CARD ────────────────────── */
+    .search-card{grid-column:3;grid-row:3}
+    .search-card input{
+      background:var(--surface2);border:1px solid var(--border);
+      border-radius:var(--r2);color:var(--text);
+      padding:clamp(6px,.8vw,10px) clamp(8px,1vw,12px);
+      font-size:clamp(10px,1vw,13px);outline:none;width:100%;
+      font-family:inherit;transition:border-color .15s;
+    }
+    .search-card input:focus{border-color:var(--accent)}
+    .search-card input::placeholder{color:var(--dim)}
+
+    /* ── ORDERS PAGE ────────────────────── */
+    .orders-wrap{padding:clamp(10px,1.5vw,20px);height:100%;display:flex;flex-direction:column;gap:12px}
+    .orders-bar{display:flex;align-items:center;gap:12px;flex-shrink:0}
+    .orders-bar h2{font-size:clamp(13px,1.4vw,17px);font-weight:500;flex:1}
+    .orders-bar input{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--r2);color:var(--text);
+      padding:6px 12px;font-size:clamp(10px,1vw,13px);
+      outline:none;font-family:inherit;width:clamp(140px,18vw,220px);
+      transition:border-color .15s;
+    }
+    .orders-bar input:focus{border-color:var(--accent)}
+    .orders-bar input::placeholder{color:var(--dim)}
+    .table-wrap{flex:1;overflow:auto;border-radius:var(--r);border:1px solid var(--border)}
+    table{width:100%;border-collapse:collapse;font-size:clamp(10px,1vw,13px)}
+    thead th{
+      background:var(--surface);color:var(--muted);font-weight:500;
+      padding:clamp(8px,1vw,12px) clamp(8px,1.2vw,14px);text-align:left;
+      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:2;
+      white-space:nowrap;font-size:clamp(9px,.85vw,11px);text-transform:uppercase;letter-spacing:.06em;
+    }
+    tbody td{
+      padding:clamp(7px,.9vw,11px) clamp(8px,1.2vw,14px);
+      border-bottom:1px solid var(--border);color:var(--text);
+      white-space:nowrap;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:rgba(59,130,246,.05)}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:clamp(9px,.85vw,11px);font-weight:500}
+    .badge::before{content:'';width:5px;height:5px;border-radius:50%;display:block}
+    .b-active{background:rgba(59,130,246,.12);color:var(--accent2)}.b-active::before{background:var(--accent)}
+    .b-done{background:rgba(16,185,129,.12);color:var(--success)}.b-done::before{background:var(--success)}
+    .b-urgent{background:rgba(245,158,11,.12);color:var(--warn)}.b-urgent::before{background:var(--warn)}
+    .b-overdue{background:rgba(239,68,68,.12);color:var(--danger)}.b-overdue::before{background:var(--danger)}
+
+    /* ── MODAL ──────────────────────────── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;align-items:center;justify-content:center}
+    .overlay.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:clamp(16px,2vw,24px);width:min(90vw,400px)}
+    .modal h3{font-size:clamp(13px,1.3vw,16px);font-weight:500;margin-bottom:14px}
+    .result-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px;font-size:clamp(10px,1vw,13px)}
+    .result-item:last-child{margin-bottom:0}
+    .result-item .ri-name{font-weight:500;color:var(--text);margin-bottom:4px}
+    .result-item .ri-info{color:var(--muted);font-size:clamp(9px,.9vw,12px)}
+    .modal-footer{display:flex;justify-content:flex-end;margin-top:14px}
+    .btn-ghost{background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--r2);padding:6px 16px;cursor:pointer;font-family:inherit;font-size:clamp(10px,1vw,13px);transition:border-color .15s,color .15s}
+    .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+
+    /* ── TOAST ──────────────────────────── */
+    .toast{position:fixed;bottom:clamp(12px,2vw,24px);right:clamp(12px,2vw,24px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:10px 18px;font-size:clamp(10px,1vw,13px);color:var(--text);opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none;z-index:100}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.ok{border-color:var(--success);color:var(--success)}
+    .toast.err{border-color:var(--danger);color:var(--danger)}
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">М</div>
+    <button class="nav-btn active" onclick="switchPage('home',this)" title="Головна">🏠</button>
+    <button class="nav-btn" onclick="switchPage('orders',this)" title="Замовлення">📋</button>
+    <div class="sep"></div>
+    <button class="nav-btn" onclick="showToast('Налаштування — незабаром','ok')" title="Налаштування">⚙️</button>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h1 id="pageTitle">Головна</h1>
+      <div class="chip" id="topDate"></div>
+    </div>
+
+    <!-- PAGES -->
+    <div class="pages">
+
+      <!-- HOME PAGE -->
+      <div class="page active" id="page-home">
+        <div class="home-grid">
+
+          <!-- Date card -->
+          <div class="card date-card">
+            <div style="flex:1"></div>
+            <div id="dayNum" class="day">—</div>
+            <div id="monthName" class="month">—</div>
+            <div id="weekDay" class="weekday">—</div>
+          </div>
+
+          <!-- Stats card -->
+          <div class="card stats-card">
+            <div class="card-title">Статистика</div>
+            <div class="stats-row">
+              <div class="ico ico-blue">🔧</div>
+              <span class="lbl">в ремонті</span>
+              <span class="val" id="sInRepair" style="color:var(--accent2)">0</span>
+            </div>
+            <div class="stats-row">
+              <div class="ico ico-amber">⏰</div>
+              <span class="lbl">термінові</span>
+              <span class="val" id="sUrgent" style="color:var(--warn)">0</span>
+            </div>
+            <div class="stats-row">
+              <div class="ico ico-red">🔥</div>
+              <span class="lbl">прострочені</span>
+              <span class="val" id="sOverdue" style="color:var(--danger)">0</span>
+            </div>
+            <div class="stats-row">
+              <div class="ico ico-green">✅</div>
+              <span class="lbl">готові до видачі</span>
+              <span class="val" id="sReady" style="color:var(--success)">0</span>
+            </div>
+          </div>
+
+          <!-- Big nums card -->
+          <div class="card bignums-card">
+            <div class="card-title" style="grid-column:1/3">Загалом</div>
+            <div class="bignum">
+              <div class="n n-blue" id="bTotal">0</div>
+              <div class="l">всього заказів</div>
+            </div>
+            <div class="bignum">
+              <div class="n n-green" id="bIssued">0</div>
+              <div class="l">видано</div>
+            </div>
+          </div>
+
+          <!-- Add order form -->
+          <div class="card form-card">
+            <div class="form-header">
+              <div class="card-title">Нове замовлення</div>
+            </div>
+            <div class="form-grid">
+              <input type="tel"    id="f-phone"  placeholder="Номер телефону"/>
+              <input type="text"   id="f-client" placeholder="Клієнт"/>
+              <input type="text"   id="f-group"  placeholder="Група / тип"/>
+              <input type="text"   id="f-color"  placeholder="Колір"/>
+              <input type="text"   id="f-serial" placeholder="Серійний номер"/>
+              <input type="date"   id="f-date"/>
+              <input type="number" id="f-price"  placeholder="До сплати (₴)"/>
+              <button class="btn-primary" onclick="addOrder()">+ Додати замовлення</button>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="card notes-card">
+            <div class="form-header">
+              <div class="card-title">Нотатки</div>
+              <button class="btn-sm" onclick="saveNotes()">Зберегти</button>
+            </div>
+            <textarea id="notesArea" placeholder="- принесли почистити ПК, видати до 13:00&#10;- прибрати в майстерні"></textarea>
+          </div>
+
+          <!-- Search -->
+          <div class="card search-card">
+            <div class="card-title">Пошук замовлення</div>
+            <input type="tel" id="sPhone" placeholder="Номер телефону" style="margin-bottom:8px"/>
+            <button class="btn-primary" onclick="searchOrder()">🔍 Пошук</button>
+            <div id="inlineResult" style="margin-top:8px;overflow:auto;flex:1"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ORDERS PAGE -->
+      <div class="page" id="page-orders">
+        <div class="orders-wrap">
+          <div class="orders-bar">
+            <h2>Замовлення</h2>
+            <input type="text" id="filterInput" placeholder="Фільтр по клієнту / телефону…" oninput="renderTable()"/>
+            <button class="btn-sm" onclick="exportCSV()">📥 CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Телефон</th>
+                <th>Клієнт</th>
+                <th>Група</th>
+                <th>Колір</th>
+                <th>Серійний №</th>
+                <th>Дата видачі</th>
+                <th>До сплати</th>
+                <th>Стан</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="searchOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3>Результати пошуку</h3>
+    <div id="modalResult"></div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal()">Закрити</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  let orders = JSON.parse(localStorage.getItem('ws_orders')||'[]');
+  let notes  = localStorage.getItem('ws_notes')||'';
+
+  function initDate(){
+    const d=new Date();
+    const days=['Неділя','Понеділок','Вівторок','Середа','Четвер','П\'ятниця','Субота'];
+    const months=['Січня','Лютого','Березня','Квітня','Травня','Червня','Липня','Серпня','Вересня','Жовтня','Листопада','Грудня'];
+    document.getElementById('dayNum').textContent=d.getDate();
+    document.getElementById('monthName').textContent=months[d.getMonth()]+' '+d.getFullYear();
+    document.getElementById('weekDay').textContent=days[d.getDay()];
+    document.getElementById('topDate').textContent=d.getDate()+' '+months[d.getMonth()];
+  }
+
+  function switchPage(id,btn){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    btn.classList.add('active');
+    const titles={home:'Головна',orders:'Замовлення'};
+    document.getElementById('pageTitle').textContent=titles[id]||id;
+    if(id==='orders') renderTable();
+  }
+
+  function updateStats(){
+    const today=new Date();today.setHours(0,0,0,0);
+    let inR=0,urg=0,ovd=0,rdy=0,issued=0;
+    orders.forEach(o=>{
+      if(o.status==='видано'){issued++;return;}
+      inR++;
+      if(o.status==='готово') rdy++;
+      if(o.status==='терміново') urg++;
+      if(o.date){const d=new Date(o.date);d.setHours(0,0,0,0);if(d<today)ovd++;}
+    });
+    document.getElementById('sInRepair').textContent=inR;
+    document.getElementById('sUrgent').textContent=urg;
+    document.getElementById('sOverdue').textContent=ovd;
+    document.getElementById('sReady').textContent=rdy;
+    document.getElementById('bTotal').textContent=orders.length;
+    document.getElementById('bIssued').textContent=issued;
+  }
+
+  function addOrder(){
+    const phone=document.getElementById('f-phone').value.trim();
+    if(!phone){showToast('Введіть номер телефону','err');return;}
+    const o={
+      id:Date.now(),
+      phone,
+      client:document.getElementById('f-client').value.trim(),
+      status:'в ремонті',
+      group:document.getElementById('f-group').value.trim(),
+      color:document.getElementById('f-color').value.trim(),
+      serial:document.getElementById('f-serial').value.trim(),
+      date:document.getElementById('f-date').value,
+      price:document.getElementById('f-price').value.trim(),
+    };
+    orders.push(o);save();updateStats();
+    ['f-phone','f-client','f-group','f-color','f-serial','f-date','f-price'].forEach(i=>document.getElementById(i).value='');
+    showToast('Замовлення додано','ok');
+  }
+
+  function badge(s){
+    const m={'в ремонті':'b-active','терміново':'b-urgent','готово':'b-done','видано':'b-done'};
+    return`<span class="badge ${m[s]||'b-active'}">${s||'в ремонті'}</span>`;
+  }
+
+  function renderTable(){
+    const q=(document.getElementById('filterInput')||{value:''}).value.toLowerCase();
+    const list=orders.filter(o=>!q||(o.phone+o.client+o.group).toLowerCase().includes(q));
+    const tbody=document.getElementById('ordersBody');
+    if(!list.length){
+      tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:32px">Замовлень ще немає</td></tr>`;
+      return;
+    }
+    tbody.innerHTML=list.map((o,i)=>`
+    <tr>
+      <td style="color:var(--dim)">${i+1}</td>
+      <td style="color:var(--accent2)">${o.phone}</td>
+      <td>${o.client||'—'}</td>
+      <td>${o.group||'—'}</td>
+      <td>${o.color||'—'}</td>
+      <td style="font-size:clamp(9px,.85vw,11px);color:var(--muted)">${o.serial||'—'}</td>
+      <td>${o.date||'—'}</td>
+      <td>${o.price?o.price+' ₴':'—'}</td>
+      <td>${badge(o.status)}</td>
+      <td><button onclick="deleteOrder(${o.id})" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s" onmouseenter="this.style.color='var(--danger)'" onmouseleave="this.style.color='var(--dim)'">✕</button></td>
+    </tr>`).join('');
+  }
+
+  function deleteOrder(id){
+    orders=orders.filter(o=>o.id!==id);save();updateStats();renderTable();showToast('Видалено','ok');
+  }
+
+  function searchOrder(){
+    const q=document.getElementById('sPhone').value.trim();
+    if(!q)return;
+    const found=orders.filter(o=>o.phone.includes(q));
+    const el=document.getElementById('inlineResult');
+    if(!found.length){
+      el.innerHTML=`<p style="color:var(--dim);font-size:clamp(10px,1vw,12px)">Нічого не знайдено</p>`;
+      return;
+    }
+    el.innerHTML=found.map(o=>`
+    <div class="result-item">
+      <div class="ri-name">${o.phone} — ${o.client||'?'}</div>
+      <div class="ri-info">${[o.group,o.color,o.serial].filter(Boolean).join(' / ')||'—'}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.date?'| '+o.date:''}${o.price?' | '+o.price+' ₴':''}</span></div>
+    </div>`).join('');
+  }
+
+  function saveNotes(){
+    notes=document.getElementById('notesArea').value;
+    localStorage.setItem('ws_notes',notes);
+    showToast('Нотатки збережено','ok');
+  }
+
+  function exportCSV(){
+    if(!orders.length){showToast('Нема даних','err');return;}
+    const h='Телефон,Клієнт,Група,Колір,Серійний,Дата,Сума,Стан';
+    const rows=orders.map(o=>[o.phone,o.client,o.group,o.color,o.serial,o.date,o.price,o.status].map(v=>`"${v||''}"`).join(','));
+    const blob=new Blob([h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='замовлення.csv';a.click();
+  }
+
+  let toastTimer;
+  function showToast(msg,type='ok'){
+    const t=document.getElementById('toast');
+    t.textContent=msg;t.className='toast '+type+' show';
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',2200);
+  }
+
+  function closeModal(){document.getElementById('searchOverlay').classList.remove('open')}
+  function save(){localStorage.setItem('ws_orders',JSON.stringify(orders))}
+
+  document.getElementById('sPhone').addEventListener('keydown',e=>e.key==='Enter'&&searchOrder());
+
+  document.getElementById('notesArea').value=notes;
+  initDate();updateStats();
+</script>
+</body>
+</html>
