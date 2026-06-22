@@ -200,12 +200,91 @@
       white-space:nowrap;font-size:clamp(9px,.85vw,11px);text-transform:uppercase;letter-spacing:.06em;
     }
     tbody td{
-      padding:clamp(7px,.9vw,11px) clamp(8px,1.2vw,14px);
+      padding:clamp(4px,.5vw,8px) clamp(8px,1.2vw,14px);
       border-bottom:1px solid var(--border);color:var(--text);
       white-space:nowrap;
+      vertical-align: middle;
     }
     tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover td{background:rgba(59,130,246,.05)}
+    tbody tr:hover td{background:rgba(59,130,246,.02)}
+
+    /* EXCEL STYLE INPUTS */
+    .cell-input {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: inherit;
+      padding: 4px 6px;
+      border-radius: var(--r2);
+      width: 100%;
+      outline: none;
+      transition: background .1s, border-color .1s;
+    }
+    .cell-input:focus {
+      background: var(--surface3);
+      border-color: var(--accent);
+    }
+
+    /* ──── ОНОВЛЕНІ НАЛАШТУВАННЯ КОЛОНОК (ЗВУЖЕННЯ ТА ЗМІЩЕННЯ ВЛІВО) ──── */
+
+    /* 1. Колонка ДІЇ (остання) */
+    thead th:last-child,
+    tbody td:last-child {
+      width: 80px !important;
+      text-align: center;
+    }
+
+    /* 2. Колонка СТАН (передостання) */
+    thead th:nth-last-child(2),
+    tbody td:nth-last-child(2) {
+      text-align: left;
+      width: 150px !important;
+      padding-left: 10px;
+    }
+
+    /* Випадаючий список у "СТАН" (блокуємо розтягування вправо) */
+    .cell-select {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: inherit;
+      padding: 4px 2px;
+      border-radius: var(--r2);
+      outline: none;
+      cursor: pointer;
+
+      display: block;      /* Перетворюємо в блок для маніпуляцій з марджинами */
+      width: auto;         /* Стискаємо селект під розмір його вмісту */
+      text-align: left;
+      margin-right: auto;  /* Виштовхуємо порожній простір праворуч, притискаючи текст вліво */
+    }
+
+    .cell-select:focus {
+      background: var(--surface3);
+      border-color: var(--accent);
+    }
+    .cell-select option {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* 3. Колонка ДО СПЛАТИ (третя з кінця) */
+    thead th:nth-last-child(3),
+    tbody td:nth-last-child(3) {
+      width: 120px !important; /* Обмежуємо ширину самої клітинки */
+      text-align: left;
+    }
+
+    /* Стискаємо сам числовий інпут у колонці "ДО СПЛАТИ" */
+    tbody td:nth-last-child(3) .cell-input {
+      max-width: 100px; /* Стрілочки і сума стають компактно на своє місце */
+      width: 100%;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────── */
+
     .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:clamp(9px,.85vw,11px);font-weight:500}
     .badge::before{content:'';width:5px;height:5px;border-radius:50%;display:block}
     .b-active{background:rgba(59,130,246,.12);color:var(--accent2)}.b-active::before{background:var(--accent)}
@@ -231,12 +310,37 @@
     .toast.show{opacity:1;transform:translateY(0)}
     .toast.ok{border-color:var(--success);color:var(--success)}
     .toast.err{border-color:var(--danger);color:var(--danger)}
+
+    /* ACTION BUTTONS */
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: color .15s, transform .1s;
+    }
+    .action-btn:active {
+      transform: scale(0.9);
+    }
+    .save-btn {
+      color: var(--dim);
+    }
+    .save-btn.changed {
+      color: var(--danger); /* Червона дискета, коли є зміни */
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.7; }
+      50% { opacity: 1; }
+      100% { opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
 <div class="shell">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">М</div>
     <button class="nav-btn active" onclick="switchPage('home',this)" title="Головна">🏠</button>
@@ -245,23 +349,18 @@
     <button class="nav-btn" onclick="showToast('Налаштування — незабаром','ok')" title="Налаштування">⚙️</button>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
 
-    <!-- TOPBAR -->
     <div class="topbar">
       <h1 id="pageTitle">Головна</h1>
       <div class="chip" id="topDate"></div>
     </div>
 
-    <!-- PAGES -->
     <div class="pages">
 
-      <!-- HOME PAGE -->
       <div class="page active" id="page-home">
         <div class="home-grid">
 
-          <!-- Date card -->
           <div class="card date-card">
             <div style="flex:1"></div>
             <div id="dayNum" class="day">—</div>
@@ -269,7 +368,6 @@
             <div id="weekDay" class="weekday">—</div>
           </div>
 
-          <!-- Stats card -->
           <div class="card stats-card">
             <div class="card-title">Статистика</div>
             <div class="stats-row">
@@ -294,7 +392,6 @@
             </div>
           </div>
 
-          <!-- Big nums card -->
           <div class="card bignums-card">
             <div class="card-title" style="grid-column:1/3">Загалом</div>
             <div class="bignum">
@@ -307,7 +404,6 @@
             </div>
           </div>
 
-          <!-- Add order form -->
           <div class="card form-card">
             <div class="form-header">
               <div class="card-title">Нове замовлення</div>
@@ -324,7 +420,6 @@
             </div>
           </div>
 
-          <!-- Notes -->
           <div class="card notes-card">
             <div class="form-header">
               <div class="card-title">Нотатки</div>
@@ -333,7 +428,6 @@
             <textarea id="notesArea" placeholder="- принесли почистити ПК, видати до 13:00&#10;- прибрати в майстерні"></textarea>
           </div>
 
-          <!-- Search -->
           <div class="card search-card">
             <div class="card-title">Пошук замовлення</div>
             <input type="tel" id="sPhone" placeholder="Номер телефону" style="margin-bottom:8px"/>
@@ -344,12 +438,11 @@
         </div>
       </div>
 
-      <!-- ORDERS PAGE -->
       <div class="page" id="page-orders">
         <div class="orders-wrap">
           <div class="orders-bar">
             <h2>Замовлення</h2>
-            <input type="text" id="filterInput" placeholder="Фільтр по клієнту / телефону…" oninput="renderTable()"/>
+            <input type="text" id="filterInput" placeholder="Фільтр по клієнту / телефону…" oninput="filterLocalTable()"/>
             <button class="btn-sm" onclick="exportCSV()">📥 CSV</button>
           </div>
           <div class="table-wrap">
@@ -363,9 +456,9 @@
                 <th>Колір</th>
                 <th>Серійний №</th>
                 <th>Дата видачі</th>
-                <th>До сплати</th>
+                <th>До сплати (₴)</th>
                 <th>Стан</th>
-                <th></th>
+                <th style="text-align:center; width:80px;">Дії</th>
               </tr>
               </thead>
               <tbody id="ordersBody"></tbody>
@@ -378,7 +471,6 @@
   </div>
 </div>
 
-<!-- MODAL -->
 <div class="overlay" id="searchOverlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3>Результати пошуку</h3>
@@ -389,11 +481,11 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-  let orders = JSON.parse(localStorage.getItem('ws_orders')||'[]');
+  const API_URL = 'http://localhost:8080/api/orders';
+  let cachedOrders = [];
   let notes  = localStorage.getItem('ws_notes')||'';
 
   function initDate(){
@@ -413,44 +505,81 @@
     btn.classList.add('active');
     const titles={home:'Головна',orders:'Замовлення'};
     document.getElementById('pageTitle').textContent=titles[id]||id;
-    if(id==='orders') renderTable();
+    if(id==='orders') loadOrders();
   }
 
-  function updateStats(){
-    const today=new Date();today.setHours(0,0,0,0);
-    let inR=0,urg=0,ovd=0,rdy=0,issued=0;
-    orders.forEach(o=>{
-      if(o.status==='видано'){issued++;return;}
-      inR++;
-      if(o.status==='готово') rdy++;
-      if(o.status==='терміново') urg++;
-      if(o.date){const d=new Date(o.date);d.setHours(0,0,0,0);if(d<today)ovd++;}
-    });
-    document.getElementById('sInRepair').textContent=inR;
-    document.getElementById('sUrgent').textContent=urg;
-    document.getElementById('sOverdue').textContent=ovd;
-    document.getElementById('sReady').textContent=rdy;
-    document.getElementById('bTotal').textContent=orders.length;
-    document.getElementById('bIssued').textContent=issued;
+  function loadStatsFromServer() {
+    fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+              const today=new Date(); today.setHours(0,0,0,0);
+              let inR=0, urg=0, ovd=0, rdy=0, issued=0;
+
+              data.forEach(o => {
+                if(o.status==='видано'){ issued++; return; }
+                inR++;
+                if(o.status==='готово') rdy++;
+                if(o.status==='терміново') urg++;
+                if(o.date){ const d=new Date(o.date); d.setHours(0,0,0,0); if(d<today) ovd++; }
+              });
+
+              document.getElementById('sInRepair').textContent=inR;
+              document.getElementById('sUrgent').textContent=urg;
+              document.getElementById('sOverdue').textContent=ovd;
+              document.getElementById('sReady').textContent=rdy;
+              document.getElementById('bTotal').textContent=data.length;
+              document.getElementById('bIssued').textContent=issued;
+            })
+            .catch(err => console.error('Помилка завантаження статистики:', err));
+  }
+
+  function loadOrders() {
+    fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+              cachedOrders = data;
+              renderTable(data);
+            })
+            .catch(err => {
+              console.error(err);
+              showToast('Помилка завантаження списку замовлень', 'err');
+            });
   }
 
   function addOrder(){
-    const phone=document.getElementById('f-phone').value.trim();
-    if(!phone){showToast('Введіть номер телефону','err');return;}
-    const o={
-      id:Date.now(),
-      phone,
-      client:document.getElementById('f-client').value.trim(),
-      status:'в ремонті',
-      group:document.getElementById('f-group').value.trim(),
-      color:document.getElementById('f-color').value.trim(),
-      serial:document.getElementById('f-serial').value.trim(),
-      date:document.getElementById('f-date').value,
-      price:document.getElementById('f-price').value.trim(),
+    const phone = document.getElementById('f-phone').value.trim();
+    const client = document.getElementById('f-client').value.trim();
+
+    if(!phone){ showToast('Введіть номер телефону', 'err'); return; }
+    if(!client){ showToast('Введіть ім\'я клієнта', 'err'); return; }
+
+    const orderData = {
+      phoneNumber: phone,
+      client: client,
+      ordersGroup: document.getElementById('f-group').value.trim(),
+      color: document.getElementById('f-color').value.trim(),
+      serialNumber: document.getElementById('f-serial').value.trim(),
+      price: parseFloat(document.getElementById('f-price').value.trim()) || 0.0
     };
-    orders.push(o);save();updateStats();
-    ['f-phone','f-client','f-group','f-color','f-serial','f-date','f-price'].forEach(i=>document.getElementById(i).value='');
-    showToast('Замовлення додано','ok');
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    })
+            .then(res => {
+              if (res.ok) return res.text();
+              throw new Error('Помилка створення');
+            })
+            .then(message => {
+              showToast(message, 'ok');
+              ['f-phone','f-client','f-group','f-color','f-serial','f-date','f-price'].forEach(i=>document.getElementById(i).value='');
+              loadStatsFromServer();
+            })
+            .catch(err => {
+              console.error(err);
+              showToast('Не вдалося зберегти замовлення', 'err');
+            });
   }
 
   function badge(s){
@@ -458,48 +587,142 @@
     return`<span class="badge ${m[s]||'b-active'}">${s||'в ремонті'}</span>`;
   }
 
-  function renderTable(){
-    const q=(document.getElementById('filterInput')||{value:''}).value.toLowerCase();
-    const list=orders.filter(o=>!q||(o.phone+o.client+o.group).toLowerCase().includes(q));
+  function markAsChanged(rowId) {
+    const saveBtn = document.getElementById(`save-${rowId}`);
+    if (saveBtn) {
+      saveBtn.classList.add('changed');
+    }
+  }
+
+  function renderTable(list){
     const tbody=document.getElementById('ordersBody');
     if(!list.length){
-      tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:32px">Замовлень ще немає</td></tr>`;
+      tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:32px">Замовлень не знайдено</td></tr>`;
       return;
     }
     tbody.innerHTML=list.map((o,i)=>`
-    <tr>
+    <tr id="row-${o.id}">
       <td style="color:var(--dim)">${i+1}</td>
-      <td style="color:var(--accent2)">${o.phone}</td>
-      <td>${o.client||'—'}</td>
-      <td>${o.group||'—'}</td>
-      <td>${o.color||'—'}</td>
-      <td style="font-size:clamp(9px,.85vw,11px);color:var(--muted)">${o.serial||'—'}</td>
-      <td>${o.date||'—'}</td>
-      <td>${o.price?o.price+' ₴':'—'}</td>
-      <td>${badge(o.status)}</td>
-      <td><button onclick="deleteOrder(${o.id})" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:color .15s" onmouseenter="this.style.color='var(--danger)'" onmouseleave="this.style.color='var(--dim)'">✕</button></td>
+      <td>
+        <input type="tel" class="cell-input" style="color:var(--accent2)" value="${o.phoneNumber||''}" oninput="markAsChanged(${o.id})" id="p-phone-${o.id}"/>
+      </td>
+      <td>
+        <input type="text" class="cell-input" value="${o.client||''}" oninput="markAsChanged(${o.id})" id="p-client-${o.id}"/>
+      </td>
+      <td>
+        <input type="text" class="cell-input" value="${o.ordersGroup||''}" oninput="markAsChanged(${o.id})" id="p-group-${o.id}"/>
+      </td>
+      <td>
+        <input type="text" class="cell-input" value="${o.color||''}" oninput="markAsChanged(${o.id})" id="p-color-${o.id}"/>
+      </td>
+      <td>
+        <input type="text" class="cell-input" style="font-size:clamp(9px,.85vw,11px);color:var(--muted)" value="${o.serialNumber||''}" oninput="markAsChanged(${o.id})" id="p-serial-${o.id}"/>
+      </td>
+      <td>
+        <input type="date" class="cell-input" value="${o.date||''}" oninput="markAsChanged(${o.id})" id="p-date-${o.id}"/>
+      </td>
+      <td>
+        <input type="number" step="0.01" class="cell-input" value="${o.price||0}" oninput="markAsChanged(${o.id})" id="p-price-${o.id}"/>
+      </td>
+      <td>
+        <select class="cell-select" onchange="markAsChanged(${o.id})" id="p-status-${o.id}">
+  <option value="🔧 в ремонті" ${o.status === '🔧 в ремонті' ? 'selected' : ''}>🔧 в ремонті</option>
+  <option value="🔥 терміново" ${o.status === '🔥 терміново' ? 'selected' : ''}>🔥 терміново</option>
+  <option value="✅ готово" ${o.status === '✅ готово' ? 'selected' : ''}>✅ готово</option>
+  <option value="📦 видано" ${o.status === '📦 видано' ? 'selected' : ''}>📦 видано</option>
+</select>
+      </td>
+      <td style="text-align:center;">
+        <button id="save-${o.id}" onclick="updateOrder(${o.id})" class="action-btn save-btn" title="Зберегти зміни">💾</button>
+        <button onclick="deleteOrder(${o.id})" class="action-btn" style="color:var(--dim)" onmouseenter="this.style.color='var(--danger)'" onmouseleave="this.style.color='var(--dim)'" title="Видалити">✕</button>
+      </td>
     </tr>`).join('');
   }
 
+  function updateOrder(id) {
+    const phone = document.getElementById(`p-phone-${id}`).value.trim();
+    const client = document.getElementById(`p-client-${id}`).value.trim();
+
+    if(!phone || !client) {
+      showToast('Телефон та Клієнт обов\'язкові!', 'err');
+      return;
+    }
+
+    const updatedData = {
+      id: id,
+      phoneNumber: phone,
+      client: client,
+      ordersGroup: document.getElementById(`p-group-${id}`).value.trim(),
+      color: document.getElementById(`p-color-${id}`).value.trim(),
+      serialNumber: document.getElementById(`p-serial-${id}`).value.trim(),
+      date: document.getElementById(`p-date-${id}`).value || null,
+      price: parseFloat(document.getElementById(`p-price-${id}`).value) || 0.0,
+      status: document.getElementById(`p-status-${id}`).value
+    };
+
+    fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    })
+            .then(res => {
+              if (res.ok) {
+                showToast('Замовлення успішно оновлено', 'ok');
+                const saveBtn = document.getElementById(`save-${id}`);
+                if (saveBtn) saveBtn.classList.remove('changed');
+                loadStatsFromServer();
+              } else {
+                throw new Error('Помилка оновлення');
+              }
+            })
+            .catch(err => {
+              console.error(err);
+              showToast('Не вдалося оновити дані', 'err');
+            });
+  }
+
+  function filterLocalTable() {
+    const q = document.getElementById('filterInput').value.toLowerCase();
+    const filtered = cachedOrders.filter(o =>
+            (o.phoneNumber + o.client + (o.ordersGroup || '')).toLowerCase().includes(q)
+    );
+    renderTable(filtered);
+  }
+
   function deleteOrder(id){
-    orders=orders.filter(o=>o.id!==id);save();updateStats();renderTable();showToast('Видалено','ok');
+    if(!confirm('Ви впевнені, що хочете видалити це замовлення?')) return;
+    fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+            .then(res => {
+              if(res.ok) {
+                showToast('Видалено', 'ok');
+                loadOrders();
+              } else {
+                showToast('Помилка видалення', 'err');
+              }
+            })
+            .catch(err => console.error(err));
   }
 
   function searchOrder(){
     const q=document.getElementById('sPhone').value.trim();
-    if(!q)return;
-    const found=orders.filter(o=>o.phone.includes(q));
-    const el=document.getElementById('inlineResult');
-    if(!found.length){
-      el.innerHTML=`<p style="color:var(--dim);font-size:clamp(10px,1vw,12px)">Нічого не знайдено</p>`;
-      return;
-    }
-    el.innerHTML=found.map(o=>`
-    <div class="result-item">
-      <div class="ri-name">${o.phone} — ${o.client||'?'}</div>
-      <div class="ri-info">${[o.group,o.color,o.serial].filter(Boolean).join(' / ')||'—'}</div>
-      <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.date?'| '+o.date:''}${o.price?' | '+o.price+' ₴':''}</span></div>
-    </div>`).join('');
+    if(!q) return;
+
+    fetch(`${API_URL}/search?phone=${encodeURIComponent(q)}`)
+            .then(res => res.json())
+            .then(found => {
+              const el=document.getElementById('inlineResult');
+              if(!found.length){
+                el.innerHTML=`<p style="color:var(--dim);font-size:clamp(10px,1vw,12px)">Нічого не знайдено</p>`;
+                return;
+              }
+              el.innerHTML=found.map(o=>`
+      <div class="result-item">
+        <div class="ri-name">${o.phoneNumber} — ${o.client||'?'}</div>
+        <div class="ri-info">${[o.ordersGroup, o.color, o.serialNumber].filter(Boolean).join(' / ')||'—'}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.date?'| '+o.date:''}${o.price?' | '+o.price+' ₴':''}</span></div>
+      </div>`).join('');
+            })
+            .catch(err => console.error(err));
   }
 
   function saveNotes(){
@@ -509,9 +732,9 @@
   }
 
   function exportCSV(){
-    if(!orders.length){showToast('Нема даних','err');return;}
+    if(!cachedOrders.length){showToast('Нема даних','err');return;}
     const h='Телефон,Клієнт,Група,Колір,Серійний,Дата,Сума,Стан';
-    const rows=orders.map(o=>[o.phone,o.client,o.group,o.color,o.serial,o.date,o.price,o.status].map(v=>`"${v||''}"`).join(','));
+    const rows=cachedOrders.map(o=>[o.phoneNumber,o.client,o.ordersGroup,o.color,o.serialNumber,o.date,o.price,o.status].map(v=>`"${v||''}"`).join(','));
     const blob=new Blob([h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='замовлення.csv';a.click();
   }
@@ -524,12 +747,12 @@
   }
 
   function closeModal(){document.getElementById('searchOverlay').classList.remove('open')}
-  function save(){localStorage.setItem('ws_orders',JSON.stringify(orders))}
 
   document.getElementById('sPhone').addEventListener('keydown',e=>e.key==='Enter'&&searchOrder());
-
   document.getElementById('notesArea').value=notes;
-  initDate();updateStats();
+
+  initDate();
+  loadStatsFromServer();
 </script>
 </body>
 </html>

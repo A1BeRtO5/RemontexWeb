@@ -24,7 +24,8 @@ public class Orders {
     private String serialNumber;
     private String client;
     private LocalDate registrationDate;
-    private String group;
+    private String ordersGroup;
     private BigDecimal price;
+    private OrderStatus status;
     private String color;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="remontex_db@localhost" uuid="3a5fc33f-9f6d-4669-aefb-184a9b0c69f0">
+    <data-source source="LOCAL" name="remontex_db@localhost" uuid="6dd28789-84ca-4232-b75e-2d8d1a5a742d">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
