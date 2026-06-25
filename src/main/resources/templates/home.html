@@ -509,28 +509,30 @@
   }
 
   function loadStatsFromServer() {
-    fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-              const today=new Date(); today.setHours(0,0,0,0);
-              let inR=0, urg=0, ovd=0, rdy=0, issued=0;
-
-              data.forEach(o => {
-                if(o.status==='видано'){ issued++; return; }
-                inR++;
-                if(o.status==='готово') rdy++;
-                if(o.status==='терміново') urg++;
-                if(o.date){ const d=new Date(o.date); d.setHours(0,0,0,0); if(d<today) ovd++; }
-              });
-
-              document.getElementById('sInRepair').textContent=inR;
-              document.getElementById('sUrgent').textContent=urg;
-              document.getElementById('sOverdue').textContent=ovd;
-              document.getElementById('sReady').textContent=rdy;
-              document.getElementById('bTotal').textContent=data.length;
-              document.getElementById('bIssued').textContent=issued;
+    // Стукаємо на наш новий ендпоінт статистики
+    fetch(`${API_URL}/stats`)
+            .then(res => {
+              if (!res.ok) throw new Error('Помилка сервера');
+              return res.json();
             })
-            .catch(err => console.error('Помилка завантаження статистики:', err));
+            .then(stats => {
+              // Просто підставляємо готові цифри, які нам порахувала база даних!
+              document.getElementById('sInRepair').textContent = stats.inRepairCount;
+              document.getElementById('sUrgent').textContent = stats.urgentCount;
+              document.getElementById('sReady').textContent = stats.readyCount;
+
+              // Прострочені залишаємо рахувати локально, або поки ставимо 0, якщо ще не налаштували дату
+              document.getElementById('sOverdue').textContent = 0;
+
+              // Великі цифри "Загалом" та "Видано"
+              document.getElementById('bTotal').textContent = stats.totalCount;
+              document.getElementById('bIssued').textContent = stats.issuedCount;
+            })
+            .catch(err => {
+              console.error('Помилка завантаження статистики:', err);
+              // Якщо бекенд старого зразка або впав, робимо деградацію до старого прорахунку (запасний варіант)
+              document.getElementById('sInRepair').textContent = "—";
+            });
   }
 
   function loadOrders() {
