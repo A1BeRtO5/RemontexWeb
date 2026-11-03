@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="sidebar" th:fragment="sidebar">
+    <div class="logo">М</div>
+    <button class="nav-btn active" onclick="switchPage('home',this)" title="Головна">🏠</button>
+    <button class="nav-btn" onclick="switchPage('orders',this)" title="Замовлення">📋</button>
+    <div class="sep"></div>
+    <button class="nav-btn" onclick="showToast('Налаштування — незабаром','ok')" title="Налаштування">⚙️</button>
+</aside>
+</body>
+</html>
