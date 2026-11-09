@@ -87,6 +87,7 @@ function addOrder() {
         ordersGroup: document.getElementById('f-group').value.trim(),
         color: document.getElementById('f-color').value.trim(),
         serialNumber: document.getElementById('f-serial').value.trim(),
+        registrationDate: document.getElementById('f-date').value || null,
         price: parseFloat(document.getElementById('f-price').value.trim()) || 0.0
     };
 
@@ -136,7 +137,7 @@ function renderTable(list) {
       <td><input type="text" class="cell-input" value="${o.ordersGroup||''}" oninput="markAsChanged(${o.id})" id="p-group-${o.id}"/></td>
       <td><input type="text" class="cell-input" value="${o.color||''}" oninput="markAsChanged(${o.id})" id="p-color-${o.id}"/></td>
       <td><input type="text" class="cell-input" style="font-size:clamp(9px,.85vw,11px);color:var(--muted)" value="${o.serialNumber||''}" oninput="markAsChanged(${o.id})" id="p-serial-${o.id}"/></td>
-      <td><input type="date" class="cell-input" value="${o.date||''}" oninput="markAsChanged(${o.id})" id="p-date-${o.id}"/></td>
+      <td><input type="date" class="cell-input" value="${o.registrationDate||''}" oninput="markAsChanged(${o.id})" id="p-registrationDate-${o.id}"/></td>
       <td><input type="number" step="0.01" class="cell-input" value="${o.price||0}" oninput="markAsChanged(${o.id})" id="p-price-${o.id}"/></td>
       <td>
         <select class="cell-select" onchange="markAsChanged(${o.id})" id="p-status-${o.id}">
@@ -169,7 +170,7 @@ function updateOrder(id) {
         ordersGroup: document.getElementById(`p-group-${id}`).value.trim(),
         color: document.getElementById(`p-color-${id}`).value.trim(),
         serialNumber: document.getElementById(`p-serial-${id}`).value.trim(),
-        date: document.getElementById(`p-date-${id}`).value || null,
+        registrationDate: document.getElementById(`p-registrationDate-${id}`).value || null,
         price: parseFloat(document.getElementById(`p-price-${id}`).value) || 0.0,
         status: document.getElementById(`p-status-${id}`).value
     };
@@ -233,7 +234,7 @@ function searchOrder() {
             <div class="result-item">
                 <div class="ri-name">${o.phoneNumber} — ${o.client||'?'}</div>
                 <div class="ri-info">${[o.ordersGroup, o.color, o.serialNumber].filter(Boolean).join(' / ')||'—'}</div>
-                <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.date?'| '+o.date:''}${o.price?' | '+o.price+' ₴':''}</span></div>
+                <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.registrationDate?'| '+o.registrationDate:''}${o.price?' | '+o.price+' ₴':''}</span></div>
             </div>`).join('');
         })
         .catch(err => console.error(err));
@@ -248,7 +249,7 @@ function saveNotes() {
 function exportCSV() {
     if(!cachedOrders.length){showToast('Нема даних','err');return;}
     const h = 'Телефон,Клієнт,Група,Колір,Серійний,Дата,Сума,Стан';
-    const rows = cachedOrders.map(o=>[o.phoneNumber,o.client,o.ordersGroup,o.color,o.serialNumber,o.date,o.price,o.status].map(v=>`"${v||''}"`).join(','));
+    const rows = cachedOrders.map(o=>[o.phoneNumber,o.client,o.ordersGroup,o.color,o.serialNumber,o.registrationDate,o.price,o.status].map(v=>`"${v||''}"`).join(','));
     const blob = new Blob([h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
     const a = document.createElement('a');a.href=URL.createObjectURL(blob);a.download='замовлення.csv';a.click();
 }
