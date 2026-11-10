@@ -27,14 +27,5 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String color;
+
 }
-
-/*
-docker run --name postgres-orders \
-        -e POSTGRES_DB=orders_db \
-        -e POSTGRES_USER=postgres \
-        -e POSTGRES_PASSWORD=postgres \
-        -p 5432:5432 \
-        -d postgres:16
-
- */
