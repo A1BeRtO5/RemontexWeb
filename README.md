@@ -1,18 +1,21 @@
 # RemontexWeb - Service Center Management System
 
-Це веб-застосунок (CRUD) для управління замовленнями в сервісному центрі з ремонту техніки. 
+Це веб-застосунок (CRUD) для управління замовленнями в сервісному центрі з ремонту техніки.
 Проєкт розроблений з використанням тришарової архітектури.
 
 ## 🛠 Технології
-*   **Backend:** Java 17, Spring Boot, Spring Data JPA, Hibernate
-*   **Database:** PostgreSQL (запускається через Docker)
-*   **Frontend:** HTML, Thymeleaf
-*   **Інструменти:** Maven, Docker, Lombok
+-   **Backend:** Java 17, Spring Boot, Spring Data JPA, Hibernate
+-   **Database:** PostgreSQL (запускається через Docker)
+-   **Frontend:** HTML, Thymeleaf
+-   **Інструменти:** Maven, Docker, Lombok
 
 ## ⚙️ Функціонал
-*   Створення, перегляд, редагування та видалення замовлень (CRUD).
-*   Зміна статусу замовлення (в обробці, виконано, скасовано).
-*   Збереження даних у реляційній базі даних.
+-   Створення, перегляд, редагування та видалення замовлень (CRUD).
+-   Зміна статусу замовлення (в обробці, виконано, скасовано).
+-   Збереження даних у реляційній базі даних.
+
+## 📋 Управління завданнями та помилками
+-   **Jira Board:** [RemontexWeb KAN Board](https://makshlbch.atlassian.net/jira/software/projects/KAN/boards/1)
 
 ## 🚀 Як запустити
 1. Склонуйте репозиторій.
