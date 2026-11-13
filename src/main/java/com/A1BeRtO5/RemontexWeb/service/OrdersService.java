@@ -1,5 +1,6 @@
 package com.A1BeRtO5.RemontexWeb.service;
 
+import com.A1BeRtO5.RemontexWeb.entity.Orders;
 import com.A1BeRtO5.RemontexWeb.repository.OrdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,5 +11,8 @@ public class OrdersService {
 
     public OrdersService(OrdersRepository ordersRepository) {
         this.ordersRepository = ordersRepository;
+    }
+    public void saveOrder(Orders order) {
+        ordersRepository.save(order);
     }
 }
