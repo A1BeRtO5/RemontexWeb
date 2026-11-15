@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class OrdersRestControllerTest {
@@ -28,5 +30,14 @@ public class OrdersRestControllerTest {
 
         ordersService.saveOrder(order);
         verify(ordersRepository, times(1)).save(order);
+    }
+    @DisplayName("тест читання всіх ордерів")
+    @Test
+    void getAllOrdersTest() {
+        List<Orders> listAll = List.of(new Orders());
+        when(ordersRepository.findAll()).thenReturn(listAll);
+
+        ordersService.getAllOrders();
+        verify(ordersRepository, times(1)).findAll();
     }
 }

@@ -5,6 +5,9 @@ import com.A1BeRtO5.RemontexWeb.repository.OrdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class OrdersService {
     private final OrdersRepository ordersRepository;
@@ -14,5 +17,8 @@ public class OrdersService {
     }
     public void saveOrder(Orders order) {
         ordersRepository.save(order);
+    }
+    public List<Orders> getAllOrders () {
+        return ordersRepository.findAll();
     }
 }
