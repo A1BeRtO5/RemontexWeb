@@ -31,7 +31,7 @@ public class OrdersRestControllerTest {
         ordersService.saveOrder(order);
         verify(ordersRepository, times(1)).save(order);
     }
-    @DisplayName("тест читання всіх ордерів")
+    @DisplayName("тест читання всіх замовлень")
     @Test
     void getAllOrdersTest() {
         List<Orders> listAll = List.of(new Orders());
@@ -39,5 +39,12 @@ public class OrdersRestControllerTest {
 
         ordersService.getAllOrders();
         verify(ordersRepository, times(1)).findAll();
+    }
+    @DisplayName("тест видалення замовлення")
+    @Test
+    void deleteOrdersByIDTest() {
+        Long id  = 1l;
+        ordersService.deleteOrdersByID(id);
+        verify(ordersRepository, times(1)).deleteById(id);
     }
 }

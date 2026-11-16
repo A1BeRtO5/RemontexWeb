@@ -17,14 +17,18 @@ public class OrdersRestController {
     private final OrdersService ordersService;  // ioc
 
     @PostMapping("/api/orders")
-    public ResponseEntity<String> createOrder(@RequestBody Orders order){
+    public ResponseEntity<String> createOrder(@RequestBody Orders order) {
         ordersService.saveOrder(order);
         return ResponseEntity.ok("Замовлення створено");
     }
     @GetMapping("/api/orders")
     public ResponseEntity<List<Orders>> getAllOrders() {
         List<Orders> listAllOrders = ordersService.getAllOrders();
-//        List listAllOrders = new ArrayList(ordersService.getAllOrders());
         return ResponseEntity.ok(listAllOrders);
+    }
+    @DeleteMapping("/api/orders/{id}")
+    public ResponseEntity<String> deleteOrders(@PathVariable Long id) {
+        ordersService.deleteOrdersByID(id);
+        return ResponseEntity.ok("Замовлення видалено");
     }
 }
