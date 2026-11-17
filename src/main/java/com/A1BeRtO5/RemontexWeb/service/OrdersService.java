@@ -26,4 +26,7 @@ public class OrdersService {
     public void deleteOrdersByID(Long id) {
         ordersRepository.deleteById(id);
     }
+    public List<Orders> searchOrderWithPhoneNumber (String phoneNumber) {
+        return ordersRepository.findByPhoneNumber(phoneNumber);
+    }
 }

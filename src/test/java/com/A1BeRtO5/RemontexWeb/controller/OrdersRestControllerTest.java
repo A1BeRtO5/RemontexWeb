@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -43,8 +45,17 @@ public class OrdersRestControllerTest {
     @DisplayName("тест видалення замовлення")
     @Test
     void deleteOrdersByIDTest() {
-        Long id  = 1l;
+        Long id  = 1L;
         ordersService.deleteOrdersByID(id);
         verify(ordersRepository, times(1)).deleteById(id);
+    }
+    @DisplayName("тест пошуку замовлення по номеру")
+    @Test
+    void searchOrdersTest() {
+        String phone = "+380501234567";
+        List<Orders> orderlist = new ArrayList<>(List.of());
+        when(ordersRepository.findByPhoneNumber(phone)).thenReturn(orderlist);
+        ordersService.searchOrderWithPhoneNumber(phone);
+        verify(ordersRepository, times(1)).findByPhoneNumber(phone);
     }
 }

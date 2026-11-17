@@ -31,4 +31,9 @@ public class OrdersRestController {
         ordersService.deleteOrdersByID(id);
         return ResponseEntity.ok("Замовлення видалено");
     }
+    @GetMapping("/api/orders/search")
+    public ResponseEntity<List<Orders>> searchOrders(@RequestParam("phone") String phoneNumber) {
+        List <Orders> searchedOrders = ordersService.searchOrderWithPhoneNumber(phoneNumber);
+        return ResponseEntity.ok(searchedOrders);
+    }
 }
