@@ -13,7 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class OrdersRestControllerTest {
@@ -57,5 +59,28 @@ public class OrdersRestControllerTest {
         when(ordersRepository.findByPhoneNumber(phone)).thenReturn(orderlist);
         ordersService.searchOrderWithPhoneNumber(phone);
         verify(ordersRepository, times(1)).findByPhoneNumber(phone);
+    }
+    @DisplayName("тест оновлення даних замовлення")
+    @Test
+    void updateOrderTest() {
+        Long id = 1L;
+        Orders order = new Orders();
+        when(ordersRepository.findById(id)).thenReturn(Optional.of(order));
+
+        ordersService.updateOrder(id, order);
+        //Перевіряємо чи запустився метод save один раз
+        verify(ordersRepository, times(1)).save(order);
+    }
+    @DisplayName("тест оновлення замовлення з хибним id")
+    @Test
+    void updateOrderTestWithWrongID() {
+        Long id = 1L;
+        Orders order = new Orders();
+        when(ordersRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class ,()-> ordersService.updateOrder(id, order));
+
+        //Перевіряємо чи запустився метод save не запускався
+        verify(ordersRepository, never()).save(order);
     }
 }

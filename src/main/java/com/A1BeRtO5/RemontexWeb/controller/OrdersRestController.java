@@ -36,4 +36,9 @@ public class OrdersRestController {
         List <Orders> searchedOrders = ordersService.searchOrderWithPhoneNumber(phoneNumber);
         return ResponseEntity.ok(searchedOrders);
     }
+    @PutMapping("/api/orders/{id}")
+    public ResponseEntity<Orders>updateOrder(@PathVariable Long id, @RequestBody Orders updatedOrder) {
+        Orders savedOrder = ordersService.updateOrder(id , updatedOrder);
+        return ResponseEntity.ok(savedOrder);
+    }
 }
