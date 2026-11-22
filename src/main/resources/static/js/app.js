@@ -25,10 +25,10 @@ function initDate() {
     const weekDay = document.getElementById('weekDay');
     const topDate = document.getElementById('topDate');
 
-    if(dayNum) dayNum.textContent = d.getDate();
-    if(monthName) monthName.textContent = months[d.getMonth()] + ' ' + d.getFullYear();
-    if(weekDay) weekDay.textContent = days[d.getDay()];
-    if(topDate) topDate.textContent = d.getDate() + ' ' + months[d.getMonth()];
+    if (dayNum) dayNum.textContent = d.getDate();
+    if (monthName) monthName.textContent = months[d.getMonth()] + ' ' + d.getFullYear();
+    if (weekDay) weekDay.textContent = days[d.getDay()];
+    if (topDate) topDate.textContent = d.getDate() + ' ' + months[d.getMonth()];
 }
 
 function switchPage(id, btn) {
@@ -51,13 +51,14 @@ function loadStatsFromServer() {
             document.getElementById('sInRepair').textContent = stats.inRepairCount;
             document.getElementById('sUrgent').textContent = stats.urgentCount;
             document.getElementById('sReady').textContent = stats.readyCount;
-            document.getElementById('sOverdue').textContent = 0;
+            document.getElementById('sOverdue').textContent = stats.overdueCount;
             document.getElementById('bTotal').textContent = stats.totalCount;
             document.getElementById('bIssued').textContent = stats.issuedCount;
         })
         .catch(err => {
             console.error('Помилка завантаження статистики:', err);
-            document.getElementById('sInRepair').textContent = "—";
+            document.getElementById('sInRepair').textContent = '—';
+            document.getElementById('sOverdue').textContent = '—';
         });
 }
 
@@ -78,8 +79,8 @@ function addOrder() {
     const phone = document.getElementById('f-phone').value.trim();
     const client = document.getElementById('f-client').value.trim();
 
-    if(!phone){ showToast('Введіть номер телефону', 'err'); return; }
-    if(!client){ showToast('Введіть ім\'я клієнта', 'err'); return; }
+    if (!phone) { showToast('Введіть номер телефону', 'err'); return; }
+    if (!client) { showToast('Введіть ім\'я клієнта', 'err'); return; }
 
     const orderData = {
         phoneNumber: phone,
@@ -87,7 +88,7 @@ function addOrder() {
         ordersGroup: document.getElementById('f-group').value.trim(),
         color: document.getElementById('f-color').value.trim(),
         serialNumber: document.getElementById('f-serial').value.trim(),
-        registrationDate: document.getElementById('f-date').value || null,
+        issueDate: document.getElementById('f-date').value || null,
         price: parseFloat(document.getElementById('f-price').value.trim()) || 0.0
     };
 
@@ -102,7 +103,7 @@ function addOrder() {
         })
         .then(message => {
             showToast(message, 'ok');
-            ['f-phone','f-client','f-group','f-color','f-serial','f-date','f-price'].forEach(i=>document.getElementById(i).value='');
+            ['f-phone', 'f-client', 'f-group', 'f-color', 'f-serial', 'f-date', 'f-price'].forEach(i => document.getElementById(i).value = '');
             loadStatsFromServer();
         })
         .catch(err => {
@@ -112,8 +113,8 @@ function addOrder() {
 }
 
 function badge(s) {
-    const m={'в ремонті':'b-active','терміново':'b-urgent','готово':'b-done','видано':'b-done'};
-    return`<span class="badge ${m[s]||'b-active'}">${s||'в ремонті'}</span>`;
+    const m = { 'в ремонті': 'b-active', 'терміново': 'b-urgent', 'готово': 'b-done', 'видано': 'b-done' };
+    return `<span class="badge ${m[s] || 'b-active'}">${s || 'в ремонті'}</span>`;
 }
 
 function markAsChanged(rowId) {
@@ -125,20 +126,20 @@ function markAsChanged(rowId) {
 
 function renderTable(list) {
     const tbody = document.getElementById('ordersBody');
-    if(!list.length){
+    if (!list.length) {
         tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:var(--dim);padding:32px">Замовлень не знайдено</td></tr>`;
         return;
     }
-    tbody.innerHTML = list.map((o,i)=>`
+    tbody.innerHTML = list.map((o, i) => `
     <tr id="row-${o.id}">
-      <td style="color:var(--dim)">${i+1}</td>
-      <td><input type="tel" class="cell-input" style="color:var(--accent2)" value="${o.phoneNumber||''}" oninput="markAsChanged(${o.id})" id="p-phone-${o.id}"/></td>
-      <td><input type="text" class="cell-input" value="${o.client||''}" oninput="markAsChanged(${o.id})" id="p-client-${o.id}"/></td>
-      <td><input type="text" class="cell-input" value="${o.ordersGroup||''}" oninput="markAsChanged(${o.id})" id="p-group-${o.id}"/></td>
-      <td><input type="text" class="cell-input" value="${o.color||''}" oninput="markAsChanged(${o.id})" id="p-color-${o.id}"/></td>
-      <td><input type="text" class="cell-input" style="font-size:clamp(9px,.85vw,11px);color:var(--muted)" value="${o.serialNumber||''}" oninput="markAsChanged(${o.id})" id="p-serial-${o.id}"/></td>
-      <td><input type="date" class="cell-input" value="${o.registrationDate||''}" oninput="markAsChanged(${o.id})" id="p-registrationDate-${o.id}"/></td>
-      <td><input type="number" step="0.01" class="cell-input" value="${o.price||0}" oninput="markAsChanged(${o.id})" id="p-price-${o.id}"/></td>
+      <td style="color:var(--dim)">${i + 1}</td>
+      <td><input type="tel" class="cell-input" style="color:var(--accent2)" value="${o.phoneNumber || ''}" oninput="markAsChanged(${o.id})" id="p-phone-${o.id}"/></td>
+      <td><input type="text" class="cell-input" value="${o.client || ''}" oninput="markAsChanged(${o.id})" id="p-client-${o.id}"/></td>
+      <td><input type="text" class="cell-input" value="${o.ordersGroup || ''}" oninput="markAsChanged(${o.id})" id="p-group-${o.id}"/></td>
+      <td><input type="text" class="cell-input" value="${o.color || ''}" oninput="markAsChanged(${o.id})" id="p-color-${o.id}"/></td>
+      <td><input type="text" class="cell-input" style="font-size:clamp(9px,.85vw,11px);color:var(--muted)" value="${o.serialNumber || ''}" oninput="markAsChanged(${o.id})" id="p-serial-${o.id}"/></td>
+      <td><input type="date" class="cell-input" value="${o.issueDate || ''}" oninput="markAsChanged(${o.id})" id="p-issueDate-${o.id}"/></td>
+      <td><input type="number" step="0.01" class="cell-input" value="${o.price || 0}" oninput="markAsChanged(${o.id})" id="p-price-${o.id}"/></td>
       <td>
         <select class="cell-select" onchange="markAsChanged(${o.id})" id="p-status-${o.id}">
           <option value="🔧 в ремонті" ${o.status === '🔧 в ремонті' ? 'selected' : ''}>🔧 в ремонті</option>
@@ -158,7 +159,7 @@ function updateOrder(id) {
     const phone = document.getElementById(`p-phone-${id}`).value.trim();
     const client = document.getElementById(`p-client-${id}`).value.trim();
 
-    if(!phone || !client) {
+    if (!phone || !client) {
         showToast('Телефон та Клієнт обов\'язкові!', 'err');
         return;
     }
@@ -170,13 +171,13 @@ function updateOrder(id) {
         ordersGroup: document.getElementById(`p-group-${id}`).value.trim(),
         color: document.getElementById(`p-color-${id}`).value.trim(),
         serialNumber: document.getElementById(`p-serial-${id}`).value.trim(),
-        registrationDate: document.getElementById(`p-registrationDate-${id}`).value || null,
+        issueDate: document.getElementById(`p-issueDate-${id}`).value || null,
         price: parseFloat(document.getElementById(`p-price-${id}`).value) || 0.0,
         status: document.getElementById(`p-status-${id}`).value
     };
 
     fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData)
     })
@@ -205,10 +206,10 @@ function filterLocalTable() {
 }
 
 function deleteOrder(id) {
-    if(!confirm('Ви впевнені, що хочете видалити це замовлення?')) return;
+    if (!confirm('Ви впевнені, що хочете видалити це замовлення?')) return;
     fetch(`${API_URL}/${id}`, { method: 'DELETE' })
         .then(res => {
-            if(res.ok) {
+            if (res.ok) {
                 showToast('Видалено', 'ok');
                 loadOrders();
             } else {
@@ -220,21 +221,21 @@ function deleteOrder(id) {
 
 function searchOrder() {
     const q = document.getElementById('sPhone').value.trim();
-    if(!q) return;
+    if (!q) return;
 
     fetch(`${API_URL}/search?phone=${encodeURIComponent(q)}`)
         .then(res => res.json())
         .then(found => {
             const el = document.getElementById('inlineResult');
-            if(!found.length){
+            if (!found.length) {
                 el.innerHTML = `<p style="color:var(--dim);font-size:clamp(10px,1vw,12px)">Нічого не знайдено</p>`;
                 return;
             }
-            el.innerHTML = found.map(o=>`
+            el.innerHTML = found.map(o => `
             <div class="result-item">
-                <div class="ri-name">${o.phoneNumber} — ${o.client||'?'}</div>
-                <div class="ri-info">${[o.ordersGroup, o.color, o.serialNumber].filter(Boolean).join(' / ')||'—'}</div>
-                <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.registrationDate?'| '+o.registrationDate:''}${o.price?' | '+o.price+' ₴':''}</span></div>
+                <div class="ri-name">${o.phoneNumber} — ${o.client || '?'}</div>
+                <div class="ri-info">${[o.ordersGroup, o.color, o.serialNumber].filter(Boolean).join(' / ') || '—'}</div>
+                <div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(o.status)}<span style="color:var(--dim);font-size:clamp(9px,.85vw,11px)">${o.issueDate ? '| ' + o.issueDate : ''}${o.price ? ' | ' + o.price + ' ₴' : ''}</span></div>
             </div>`).join('');
         })
         .catch(err => console.error(err));
@@ -243,22 +244,22 @@ function searchOrder() {
 function saveNotes() {
     notes = document.getElementById('notesArea').value;
     localStorage.setItem('ws_notes', notes);
-    showToast('Нотатки збережено','ok');
+    showToast('Нотатки збережено', 'ok');
 }
 
 function exportCSV() {
-    if(!cachedOrders.length){showToast('Нема даних','err');return;}
+    if (!cachedOrders.length) { showToast('Нема даних', 'err'); return; }
     const h = 'Телефон,Клієнт,Група,Колір,Серійний,Дата,Сума,Стан';
-    const rows = cachedOrders.map(o=>[o.phoneNumber,o.client,o.ordersGroup,o.color,o.serialNumber,o.registrationDate,o.price,o.status].map(v=>`"${v||''}"`).join(','));
-    const blob = new Blob([h+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8;'});
-    const a = document.createElement('a');a.href=URL.createObjectURL(blob);a.download='замовлення.csv';a.click();
+    const rows = cachedOrders.map(o => [o.phoneNumber, o.client, o.ordersGroup, o.color, o.serialNumber, o.issueDate, o.price, o.status].map(v => `"${v || ''}"`).join(','));
+    const blob = new Blob([h + '\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'замовлення.csv'; a.click();
 }
 
 let toastTimer;
-function showToast(msg,type='ok') {
+function showToast(msg, type = 'ok') {
     const t = document.getElementById('toast');
-    t.textContent = msg;t.className = 'toast '+type+' show';
-    clearTimeout(toastTimer);toastTimer = setTimeout(()=>t.className='toast',2200);
+    t.textContent = msg; t.className = 'toast ' + type + ' show';
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = 'toast', 2200);
 }
 
-function closeModal(){document.getElementById('searchOverlay').classList.remove('open')}
+function closeModal() { document.getElementById('searchOverlay').classList.remove('open'); }

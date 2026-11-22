@@ -1,5 +1,6 @@
 package com.A1BeRtO5.RemontexWeb.service;
 
+import com.A1BeRtO5.RemontexWeb.entity.HomePageStatusPanel;
 import com.A1BeRtO5.RemontexWeb.entity.OrderStatus;
 import com.A1BeRtO5.RemontexWeb.entity.Orders;
 import com.A1BeRtO5.RemontexWeb.repository.OrdersRepository;
@@ -40,12 +41,22 @@ public class OrdersService {
         changeOrder.setPhoneNumber(newOrders.getPhoneNumber());
         changeOrder.setSerialNumber(newOrders.getSerialNumber());
         changeOrder.setClient(newOrders.getClient());
-        changeOrder.setRegistrationDate(newOrders.getRegistrationDate());
+        changeOrder.setIssueDate(newOrders.getIssueDate());
         changeOrder.setOrdersGroup(newOrders.getOrdersGroup());
         changeOrder.setPrice(newOrders.getPrice());
         changeOrder.setStatus(newOrders.getStatus());
         changeOrder.setColor(newOrders.getColor());
 
         return ordersRepository.save(changeOrder);
+    }
+    public HomePageStatusPanel getAllStatus() {
+        Long overdueCount = ordersRepository.countByIssueDateBefore(LocalDate.now());
+        Long inRepairCount = ordersRepository.countByStatus(OrderStatus.IN_REPAIR);
+        Long urgentCount = ordersRepository.countByStatus(OrderStatus.URGENT);
+        Long readyCount = ordersRepository.countByStatus(OrderStatus.READY);
+        Long totalCount = ordersRepository.count();
+        Long issuedCount = ordersRepository.countByStatus(OrderStatus.ISSUED);
+
+        return new HomePageStatusPanel(inRepairCount, urgentCount, overdueCount, readyCount, totalCount, issuedCount);
     }
 }

@@ -1,5 +1,6 @@
 package com.A1BeRtO5.RemontexWeb.controller;
 
+import com.A1BeRtO5.RemontexWeb.entity.HomePageStatusPanel;
 import com.A1BeRtO5.RemontexWeb.entity.Orders;
 import com.A1BeRtO5.RemontexWeb.service.OrdersService;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +37,14 @@ public class OrdersRestController {
         List <Orders> searchedOrders = ordersService.searchOrderWithPhoneNumber(phoneNumber);
         return ResponseEntity.ok(searchedOrders);
     }
-    @PutMapping("/api/orders/{id}")
+    @PatchMapping("/api/orders/{id}")
     public ResponseEntity<Orders>updateOrder(@PathVariable Long id, @RequestBody Orders updatedOrder) {
         Orders savedOrder = ordersService.updateOrder(id , updatedOrder);
         return ResponseEntity.ok(savedOrder);
+    }
+    @GetMapping("/api/orders/stats")
+    public ResponseEntity<HomePageStatusPanel> getOrderStatus() {
+        HomePageStatusPanel status = ordersService.getAllStatus();
+        return ResponseEntity.ok(status);
     }
 }

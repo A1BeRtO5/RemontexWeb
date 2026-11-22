@@ -15,13 +15,12 @@ import java.time.LocalDate;
 @Entity
 public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // розібрати інші значення
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String phoneNumber;
     private String serialNumber;
     private String client;
-    private LocalDate registrationDate;
+    private LocalDate issueDate;
     private String ordersGroup;
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
